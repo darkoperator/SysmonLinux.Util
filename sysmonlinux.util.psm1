@@ -89,13 +89,13 @@ function Get-SysmonLinuxEvent {
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
-        # ProcessGuid to search for a given event type.
+        # ProcessGuid to search for a given event type, ParentProcessGuid will also be matched to this value.
         [Parameter(Mandatory=$false,
             ParameterSetName="Guid")]
         [string[]]
         $ProcessGuid,
 
-        # Image to search for a given event type.
+        # Image to search for a given event type.The '*' wildcard is supported for matching.
         [Parameter(mandatory=$false)]
         [SupportsWildcards()]
         [string[]]
@@ -270,45 +270,45 @@ function Get-SysmonLinuxProcessCreate {
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
-        # ProcessGuid to search for a given event type.
+        # ProcessGuid to search for, one or more can be provided.
         [Parameter(Mandatory=$false,
             ParameterSetName="ProcessGuid")]
         [string[]]
         $ProcessGuid,
 
         # RuleName to search for the given event type.
-        [Parameter(mandatory=$false)]
-        [string]
-        $RuleName,
+        #[Parameter(mandatory=$false)]
+        #[string]
+        #$RuleName,
 
-        # ProcessID to search for a given event type.
+        # ProcessID to search for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $ProcessId,
 
-        # ProcessGuid to search for a given event type.
+        # ProcessGuid to search for, one or more can be provided..
         [Parameter(Mandatory=$false)]
         [string[]]
         $ParentProcessGuid,
 
-        # Logon to search for a given event type.
+        # Logon to search for , one or more can be provided.
         [Parameter(Mandatory=$false,
             ParameterSetName="LogonGuid")]
         [string[]]
         $LogonGuid,
 
-        # LogonId to search for a given event type.
+        # LogonId to search for , one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $LogonId,
 
-        # Image to search for a given event type.
+        # Image to search for this event type.The '*' wildcard is supported for matching.
         [Parameter(mandatory=$false)]
         [SupportsWildcards()]
         [string[]]
         $Image,
 
-        # CommandLine to search for a given event type.
+        # CommandLine to search for this event type.The '*' wildcard is supported for matching.
         [Parameter(mandatory=$false)]
         [SupportsWildcards()]
         [string[]]
@@ -319,34 +319,34 @@ function Get-SysmonLinuxProcessCreate {
         [string[]]
         $CurrentDirectory,
 
-        # User to seach for a given event type.
+        # User to seach for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $User,
 
-        # ParentImage to search for a given event type.
+        # ParentImage to search for, one or more can be provided.
         [Parameter(mandatory=$false)]
         [SupportsWildcards()]
         [string[]]
         $ParentImage,
 
-        # ParentProcessId to search for a given event type.
+        # ParentProcessId to search for, one or more can be provided.
         [Parameter(mandatory=$false)]
         [string[]]
         $ParentProcessId,
 
-        # ParentCommandLine to search for a given event type.
+        # ParentCommandLine to search for this event type.The '*' wildcard is supported for matching.
         [Parameter(mandatory=$false)]
         [SupportsWildcards()]
         [string[]]
         $ParentCommandLine,
 
-        # TerminalSessionId to search for a given event type.
+        # TerminalSessionId to search for, one or more can be provided.
         [Parameter(mandatory=$false)]
         [string[]]
         $TerminalSessionId,
 
-        # ParentUser to seach for a given event type.
+        # ParentUser to seach for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $ParentUser,
@@ -494,28 +494,28 @@ function Get-SysmonLinuxProcessTerminate {
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
-        # ProcessGuid to search for a given event type.
+        # ProcessGuid to search for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $ProcessGuid,
 
         # RuleName to search for the given event type.
-        [Parameter(mandatory=$false)]
-        [string]
-        $RuleName,
+        #[Parameter(mandatory=$false)]
+        #[string]
+        #$RuleName,
 
-        # ProcessID to search for a given event type.
+        # ProcessID to search for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $ProcessId,
 
-        # Image to search for a given event type.
+        # Image to search forthis event type.The '*' wildcard is supported for matching.
         [Parameter(mandatory=$false)]
         [SupportsWildcards()]
         [string[]]
         $Image,
 
-        # User to seach for a given event type.
+        # User to seach for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $User,
@@ -646,7 +646,7 @@ function Get-SysmonLinuxConfigChange {
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
-        # ProcessGuid to search for a given event type.
+        # Configuration file used to configure the service.
         [Parameter(Mandatory=$false)]
         [string]
         $Configuration,
@@ -776,7 +776,7 @@ function Get-SysmonLinuxState {
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
-        # State to search for a given event type.
+        # State of the service to search for.
         [Parameter(Mandatory=$false)]
         [ValidateSet("Started", "Stopped")]
         [string]
@@ -899,7 +899,7 @@ function Get-SysmonLinuxFileCreate {
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
-        # ProcessGuid to search for a given event type.
+        # ProcessGuid to search for, one or more can be provided.
         [Parameter(Mandatory=$false,
         ParameterSetName="ProcessGuid")]
         [string[]]
@@ -910,23 +910,23 @@ function Get-SysmonLinuxFileCreate {
         #[string]
         #$RuleName,
 
-        # ProcessID to search for a given event type.
+        # ProcessID to search for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $ProcessId,
 
-        # Image to search for a given event type.
+        # Image to search for, one or more can be provided. The '*' wildcard is supported for matching.
         [Parameter(mandatory=$false)]
         [string[]]
         $Image,
 
-        # TargetFilename to search for a given event type.
+        # TargetFilename to search for, one or more can be provided. The '*' wildcard is supported for matching.
         [Parameter(mandatory=$false)]
         [SupportsWildcards()]
         [string[]]
         $TargetFilename,
 
-        # User to seach for a given event type.
+        # User to seach for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $User,
@@ -1053,35 +1053,35 @@ function Get-SysmonLinuxFileDelete {
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
-        # ProcessGuid to search for a given event type.
+        # ProcessGuid to search for, one or more can be provided.
         [Parameter(Mandatory=$false,
             ParameterSetName="ProcessGuid")]
         [string[]]
         $ProcessGuid,
 
-        # RuleName to search for the given event type.
+        # RuleName to search for, one or more can be provided.
         #[Parameter(mandatory=$false)]
         #[string[]]
         #$RuleName,
 
-        # ProcessID to search for a given event type.
+        # ProcessID to search for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $ProcessId,
 
-        # Image to search for a given event type.
+        # Image to search for, one or more can be provided. The '*' wildcard is supported for matching.
         [Parameter(mandatory=$false)]
         [SupportsWildcards()]
         [string[]]
         $Image,
 
-        # TargetFilename to search for a given event type.
+        # TargetFilename to search for, one or more can be provided. The '*' wildcard is supported for matching.
         [Parameter(mandatory=$false)]
         [SupportsWildcards()]
         [string[]]
         $TargetFilename,
 
-        # User to seach for a given event type.
+        # User to seach for, one or more can be provided.
         [Parameter(Mandatory=$false)]
         [string[]]
         $User,
