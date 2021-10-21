@@ -14,3 +14,112 @@ Functions:
 - Get-SysmonLinuxProcessTerminate
 - Get-SysmonLinuxRawAccess
 - Get-SysmonLinuxState
+
+
+```PowerShell
+PS />Get-SysmonLinuxEvent -EventType Any -ProcessGuid "{de9527a5-6a3f-616f-a52f-d98154560000}"
+    
+    EventId           : 1
+    Version           : 5
+    EventType         : ProcessCreate
+    Computer          : ubuntu
+    EventRecordID     : 35705
+    RuleName          : -
+    UtcTime           : 2021-10-20 01:00:47.600
+    ProcessGuid       : {de9527a5-6a3f-616f-a52f-d98154560000}
+    ProcessId         : 2356
+    Image             : /usr/sbin/dumpe2fs
+    FileVersion       : -
+    Description       : -
+    Product           : -
+    Company           : -
+    OriginalFileName  : -
+    CommandLine       : dumpe2fs -h /dev/sda5
+    CurrentDirectory  : /
+    User              : root
+    LogonGuid         : {de9527a5-0000-0000-0000-000000000000}
+    LogonId           : 0
+    TerminalSessionId : 4294967295
+    IntegrityLevel    : no level
+    Hashes            : -
+    ParentProcessGuid : {00000000-0000-0000-0000-000000000000}
+    ParentProcessId   : 874
+    ParentImage       : -
+    ParentCommandLine : -
+    ParentUser        : -
+    
+    EventId       : 9
+    Version       : 2
+    EventType     : RawAccessRead
+    Computer      : ubuntu
+    EventRecordID : 35706
+    RuleName      : -
+    UtcTime       : 2021-10-20 01:00:47.619
+    ProcessGuid   : {de9527a5-6a3f-616f-a52f-d98154560000}
+    ProcessId     : 2356
+    Image         : /usr/sbin/dumpe2fs
+    Device        : /dev/sda5
+    User          : root
+    
+    EventId       : 5
+    Version       : 3
+    EventType     : ProcessTerminate
+    Computer      : ubuntu
+    EventRecordID : 35707
+    RuleName      : -
+    UtcTime       : 2021-10-20 01:00:47.620
+    ProcessGuid   : {de9527a5-6a3f-616f-a52f-d98154560000}
+    ProcessId     : 2356
+    Image         : /usr/sbin/dumpe2fs
+    User          : root
+
+```
+
+```PowerShell
+PS /> ls syslog* | Get-SysmonLinuxProcessCreate -Image */ping,*/whoami,*/id
+
+        EventId           : 1
+        Version           : 5
+        EventType         : ProcessCreate
+        Computer          : ubuntu
+        EventRecordID     : 7468
+        RuleName          : -
+        UtcTime           : 2021-10-16 04:51:15.156
+        ProcessGuid       : {de9527a5-5a43-616a-312b-c11c7a550000}
+        ProcessId         : 8455
+        Image             : /usr/bin/ping
+        FileVersion       : -
+        Description       : -
+        Product           : -
+        Company           : -
+        OriginalFileName  : -
+        CommandLine       : ping 8.8.8.8 -c 2
+        CurrentDirectory  : /home/carlos/Desktop
+        User              : carlos
+        LogonGuid         : {de9527a5-0000-0000-e803-000001000000}
+        LogonId           : 1000
+        TerminalSessionId : 3
+        IntegrityLevel    : no level
+        Hashes            : -
+        ParentProcessGuid : {de9527a5-5a43-616a-f537-ea5ba5550000}
+        ParentProcessId   : 8454
+        ParentImage       : /usr/bin/dash
+        ParentCommandLine : /usr/bin/sh
+        ParentUser        : carlos
+ ```
+ 
+ ```PowerShell
+ PS /home/carlos/Desktop> Get-SysmonLinuxRawAccess | select image,device -unique | ConvertTo-SysmonRule
+<Rule groupRelation="and">
+  <Image condition='is'>/usr/lib/systemd/systemd-logind</Image>
+  <Device condition='is'>/dev/sda1</Device>
+</Rule>
+<Rule groupRelation="and">
+  <Image condition='is'>/usr/lib/systemd/systemd-logind</Image>
+  <Device condition='is'>/dev/sda</Device>
+</Rule>
+<Rule groupRelation="and">
+  <Image condition='is'>/usr/sbin/dumpe2fs</Image>
+  <Device condition='is'>/dev/sda5</Device>
+</Rule>
+ ```
