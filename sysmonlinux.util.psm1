@@ -86,6 +86,7 @@ function Get-SysmonLinuxEvent {
                    HelpMessage="Path to one or more locations.")]
         [Alias("PSPath")]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
@@ -140,14 +141,14 @@ function Get-SysmonLinuxEvent {
         }
         $eventids = $eventToQ -join "|"
         write-verbose -message "Searching for events $($eventids)"
-        $pattern = "^*sysmon:.*<EventID>($($eventids))<\/EventID>"
+        $pattern = "^.*sysmon:.*<EventID>($($eventids))<\/EventID>"
 
         if ($ProcessGuid.Length -gt 0){
             $pattern = $pattern + ".*<Data Name=`"(ProcessGuid|ParentProcessGuid)`">($($ProcessGuid -join "|"))<\/Data>"
         }
 
         if ($Image.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=\`"Image\`">($(($Image -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($User.Length -gt 0) {
@@ -158,7 +159,13 @@ function Get-SysmonLinuxEvent {
     }
     
     process {
-        Select-String -Pattern $pattern -Path $SyslogFile | ForEach-Object {
+        if ($SyslogFile -like "*.gz") {
+            $file2process = Expand-GzFile (resolve-path $SyslogFile).Path
+        } else {
+            $file2process = $SyslogFile
+        }
+        Write-Verbose -Message "Opening $($file2process)"
+        Select-String -Pattern $pattern -Path $file2process | ForEach-Object {
             $evtxml = [xml]($_.line.split("sysmon:"))[1]
             $EvtInfo = [ordered]@{}
             $EvtInfo['EventId'] = $evtxml.Event.System.EventID
@@ -267,6 +274,7 @@ function Get-SysmonLinuxProcessCreate {
                    HelpMessage="Path to one or more locations.")]
         [Alias("PSPath")]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
@@ -381,11 +389,11 @@ function Get-SysmonLinuxProcessCreate {
         }
 
         if ($Image.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($CommandLine.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"CommandLine`">($(($CommandLine -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"CommandLine`">($(($CommandLine -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($CurrentDirectory.Length -gt 0) {
@@ -417,11 +425,11 @@ function Get-SysmonLinuxProcessCreate {
         }
 
         if ($ParentImage.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"ParentImage`">($(($ParentImage -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"ParentImage`">($(($ParentImage -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($ParentCommandLine.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"ParentCommandLine`">($(($ParentCommandLine -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"ParentCommandLine`">($(($ParentCommandLine -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($ParentUser.Length -gt 0) {
@@ -434,7 +442,14 @@ function Get-SysmonLinuxProcessCreate {
     }
     
     process {
-        Select-String -Pattern $pattern -Path $SyslogFile | ForEach-Object {
+
+        if ($SyslogFile -like "*.gz") {
+            $file2process = Expand-GzFile (resolve-path $SyslogFile).Path
+        } else {
+            $file2process = $SyslogFile
+        }
+        Write-Verbose -Message "Opening $($file2process)"
+        Select-String -Pattern $pattern -Path $file2process | ForEach-Object {
             try {
                 $evtxml = [xml]($_.line.split("sysmon:"))[1]
             } catch {
@@ -491,6 +506,7 @@ function Get-SysmonLinuxProcessTerminate {
                    HelpMessage="Path to one or more locations.")]
         [Alias("PSPath")]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
@@ -552,7 +568,7 @@ function Get-SysmonLinuxProcessTerminate {
         }
 
         if ($Image.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($User.Length -gt 0) {
@@ -565,7 +581,13 @@ function Get-SysmonLinuxProcessTerminate {
     }
     
     process {
-        Select-String -Pattern $pattern -Path $SyslogFile | ForEach-Object {
+        if ($SyslogFile -like "*.gz") {
+            $file2process = Expand-GzFile (resolve-path $SyslogFile).Path
+        } else {
+            $file2process = $SyslogFile
+        }
+        Write-Verbose -Message "Opening $($file2process)"
+        Select-String -Pattern $pattern -Path $file2process | ForEach-Object {
             try {
                 $evtxml = [xml]($_.line.split("sysmon:"))[1]
             } catch {
@@ -643,6 +665,7 @@ function Get-SysmonLinuxConfigChange {
                    HelpMessage="Path to one or more locations.")]
         [Alias("PSPath")]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
@@ -677,7 +700,13 @@ function Get-SysmonLinuxConfigChange {
     }
     
     process {
-        Select-String -Pattern $pattern -Path $SyslogFile | ForEach-Object {
+        if ($SyslogFile -like "*.gz") {
+            $file2process = Expand-GzFile (resolve-path $SyslogFile).Path
+        } else {
+            $file2process = $SyslogFile
+        }
+        Write-Verbose -Message "Opening $($file2process)"
+        Select-String -Pattern $pattern -Path $file2process | ForEach-Object {
             try {
                 $evtxml = [xml]($_.line.split("sysmon:"))[1]
             } catch {
@@ -773,6 +802,7 @@ function Get-SysmonLinuxState {
                    HelpMessage="Path to one or more locations.")]
         [Alias("PSPath")]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
@@ -808,7 +838,13 @@ function Get-SysmonLinuxState {
     }
     
     process {
-        Select-String -Pattern $pattern -Path $SyslogFile | ForEach-Object {
+        if ($SyslogFile -like "*.gz") {
+            $file2process = Expand-GzFile (resolve-path $SyslogFile).Path
+        } else {
+            $file2process = $SyslogFile
+        }
+        Write-Verbose -Message "Opening $($file2process)"
+        Select-String -Pattern $pattern -Path $file2process | ForEach-Object {
             try {
                 $evtxml = [xml]($_.line.split("sysmon:"))[1]
             } catch {
@@ -896,6 +932,7 @@ function Get-SysmonLinuxFileCreate {
                    HelpMessage="Path to one or more locations.")]
         [Alias("PSPath")]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
@@ -961,11 +998,11 @@ function Get-SysmonLinuxFileCreate {
         }
 
         if ($Image.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($TargetFilename.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"TargetFilename`">($(($TargetFilename -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"TargetFilename`">($(($TargetFilename -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         write-verbose -Message "RegEx is $pattern"
@@ -974,7 +1011,13 @@ function Get-SysmonLinuxFileCreate {
     }
     
     process {
-        Select-String -Pattern $pattern -Path $SyslogFile | ForEach-Object {
+        if ($SyslogFile -like "*.gz") {
+            $file2process = Expand-GzFile (resolve-path $SyslogFile).Path
+        } else {
+            $file2process = $SyslogFile
+        }
+        Write-Verbose -Message "Opening $($file2process)"
+        Select-String -Pattern $pattern -Path $file2process | ForEach-Object {
             try {
                 $evtxml = [xml]($_.line.split("sysmon:"))[1]
             } catch {
@@ -1050,6 +1093,7 @@ function Get-SysmonLinuxFileDelete {
                    HelpMessage="Path to one or more locations.")]
         [Alias("PSPath")]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
@@ -1116,11 +1160,11 @@ function Get-SysmonLinuxFileDelete {
         }
 
         if ($Image.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($TargetFilename.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"TargetFilename`">($(($TargetFilename -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"TargetFilename`">($(($TargetFilename -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         write-verbose -Message "RegEx is $pattern"
@@ -1129,7 +1173,13 @@ function Get-SysmonLinuxFileDelete {
     }
     
     process {
-        Select-String -Pattern $pattern -Path $SyslogFile | ForEach-Object {
+        if ($SyslogFile -like "*.gz") {
+            $file2process = Expand-GzFile (resolve-path $SyslogFile).Path
+        } else {
+            $file2process = $SyslogFile
+        }
+        Write-Verbose -Message "Opening $($file2process)"
+        Select-String -Pattern $pattern -Path $file2process | ForEach-Object {
             try {
                 $evtxml = [xml]($_.line.split("sysmon:"))[1]
             } catch {
@@ -1220,6 +1270,7 @@ function Get-SysmonLinuxRawAccess {
                    HelpMessage="Path to one or more locations.")]
         [Alias("PSPath")]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
@@ -1285,7 +1336,7 @@ function Get-SysmonLinuxRawAccess {
         }
 
         if ($Image.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"Image`">($(($Image -join "|").Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($Device.Length -gt 0) {
@@ -1298,7 +1349,13 @@ function Get-SysmonLinuxRawAccess {
     }
     
     process {
-        Select-String -Pattern $pattern -Path $SyslogFile | ForEach-Object {
+        if ($SyslogFile -like "*.gz") {
+            $file2process = Expand-GzFile (resolve-path $SyslogFile).Path
+        } else {
+            $file2process = $SyslogFile
+        }
+        Write-Verbose -Message "Opening $($file2process)"
+        Select-String -Pattern $pattern -Path $file2process | ForEach-Object {
             try {
                 $evtxml = [xml]($_.line.split("sysmon:"))[1]
             } catch {
@@ -1358,6 +1415,7 @@ function Get-SysmonLinuxNetworkConnect {
                    HelpMessage="Path to one or more locations.")]
         [Alias("PSPath")]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string[]]
         $SyslogFile = @("/var/log/syslog"),
 
@@ -1456,7 +1514,7 @@ function Get-SysmonLinuxNetworkConnect {
         }
 
         if ($Image.Length -gt 0) {
-            $pattern = $pattern + ".*<Data Name=`"Image`">($($Image.Replace("`*",".`*")))<\/Data>"
+            $pattern = $pattern + ".*<Data Name=`"Image`">($($Image.Replace("`*","\S`*")))<\/Data>"
         }
 
         if ($Protocol.Length -gt 0) {
@@ -1497,7 +1555,13 @@ function Get-SysmonLinuxNetworkConnect {
     }
     
     process {
-        Select-String -Pattern $pattern -Path $SyslogFile | ForEach-Object {
+        if ($SyslogFile -like "*.gz") {
+            $file2process = Expand-GzFile (resolve-path $SyslogFile).Path
+        } else {
+            $file2process = $SyslogFile
+        }
+        Write-Verbose -Message "Opening $($file2process)"
+        Select-String -Pattern $pattern -Path $file2process | ForEach-Object {
             try {
                 $evtxml = [xml]($_.line.split("sysmon:"))[1]
             } catch {
@@ -1573,13 +1637,13 @@ function ConvertTo-SysmonRule {
             $propCount = (Get-Member -InputObject $event -MemberType Properties).count
             if ($propCount -eq 1){
                 $event.PSObject.Properties | ForEach-Object {
-                    "<$($_.name) condition='$($Condition)'>$($_.value)</$($_.name)>"
+                    "<$($_.name) condition='$($Condition)'>$($_.value.Replace("&","&amp;"))</$($_.name)>"
                 }
 
             } elseif ($propCount -gt 1) {
                 $RuleGroup = "<Rule groupRelation=`"and`">`n"
                 $event.PSObject.Properties | ForEach-Object {
-                    $RuleGroup += "  <$($_.name) condition='$($Condition)'>$($_.value)</$($_.name)>`n"
+                    $RuleGroup += "  <$($_.name) condition='$($Condition)'>$($_.value.Replace("&","&amp;"))</$($_.name)>`n"
                 }
                 $RuleGroup += "</Rule>"
                 $RuleGroup
@@ -1588,3 +1652,32 @@ function ConvertTo-SysmonRule {
     }
     end {}
 }
+
+
+Function Expand-GzFile{                         
+    Param(
+        $infile
+    ) 
+    begin{}
+
+    process{
+        $outfile = "$([System.IO.Path]::GetTempPath())$([System.IO.Path]::GetFileNameWithoutExtension($infile))"
+        $inputfile = New-Object System.IO.FileStream $inFile, ([IO.FileMode]::Open), ([IO.FileAccess]::Read), ([IO.FileShare]::Read)
+        $output = New-Object System.IO.FileStream $outFile, ([IO.FileMode]::Create), ([IO.FileAccess]::Write), ([IO.FileShare]::None)
+        $gzipStream = New-Object System.IO.Compression.GzipStream $inputfile, ([IO.Compression.CompressionMode]::Decompress)
+        
+        $buffer = New-Object byte[](1024)
+        while($true){
+        $read = $gzipstream.Read($buffer, 0, 1024)
+        if ($read -le 0){break}
+            $output.Write($buffer, 0, $read)
+        }
+        
+        $gzipStream.Close()
+        $output.Close()
+        $inputfile.Close()
+
+        $outfile
+    }   
+}
+
